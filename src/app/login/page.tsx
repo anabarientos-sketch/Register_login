@@ -12,7 +12,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,24 +19,22 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    // 🚨 HARD FRONTEND VALIDATION (BLOCKS DASHBOARD ALWAYS)
-    if (!username.trim() || !password.trim() || !email.trim()) {
-      setError("Please fill all fields. Login cannot continue.");
-      return; // ⛔ STOP IMMEDIATELY
+    if (!username.trim() || !password.trim()) {
+      setError("Please fill both username and password fields.");
+      return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/login`, {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, email }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
 
-      // 🚨 BLOCK dashboard even if backend wrongly sends success
       if (!res.ok || !data?.accessToken) {
         setError(
           res.status === 404
@@ -45,20 +42,11 @@ export default function LoginPage() {
             : data.message || "Invalid login. Try again."
         );
         setLoading(false);
-        return; // ⛔ STOP, DON'T NAVIGATE
+        return;
       }
 
-      // 🟩 FINAL CHECK: accessToken MUST exist
-      if (!data.accessToken || data.accessToken.length < 10) {
-        setError("Invalid login token. Cannot continue.");
-        setLoading(false);
-        return; // ⛔ STILL BLOCK
-      }
-
-      // 🟩 LOGIN SUCCESS
       saveToken(data.accessToken);
       router.push("/dashboard");
-
     } catch {
       setError("Server error. Try again later.");
     }
@@ -80,6 +68,7 @@ export default function LoginPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
 
             <Input
@@ -88,13 +77,7 @@ export default function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <Input
-              className="bg-[#262626] text-white border-[#333]"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              required
             />
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -114,6 +97,14 @@ export default function LoginPage() {
             onClick={() => router.push("/register")}
           >
             Create an Account
+          </Button>
+
+          <Button
+            variant="link"
+            className="w-full text-[#ff6b00]"
+            onClick={() => router.push("/")}
+          >
+            Back to Home
           </Button>
         </CardContent>
       </Card>

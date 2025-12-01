@@ -20,13 +20,12 @@ export default function RegisterPage() {
     setError("");
     setSuccess(false);
 
-    // ❗ FRONT-END VALIDATION
     if (!username || !password || !email) {
       setError("Please fill out all fields.");
       return;
     }
 
-    const res = await fetch(`${API_BASE}/register`, {
+    const res = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password, email }),
@@ -34,13 +33,11 @@ export default function RegisterPage() {
 
     const data = await res.json();
 
-    // ❗ BACKEND ERROR HANDLING (username/email already exists)
     if (!res.ok) {
       setError(data.message || "Registration failed.");
       return;
     }
 
-    // SUCCESS
     setSuccess(true);
     setUsername("");
     setPassword("");
@@ -74,6 +71,7 @@ export default function RegisterPage() {
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
 
               <Input
@@ -82,6 +80,7 @@ export default function RegisterPage() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
 
               <Input
@@ -89,9 +88,9 @@ export default function RegisterPage() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
 
-              {/* ⚠️ Display Error */}
               {error && (
                 <p className="text-red-500 text-sm font-medium">{error}</p>
               )}
@@ -114,6 +113,14 @@ export default function RegisterPage() {
               Back to Login
             </Button>
           )}
+
+          <Button
+            variant="link"
+            className="w-full text-[#ff6b00]"
+            onClick={() => router.push("/")}
+          >
+            Back to Home
+          </Button>
         </CardContent>
       </Card>
     </div>
