@@ -146,14 +146,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f0f4f0] via-[#e8f0e8] to-[#dfe8df] p-6 flex justify-center text-[#3b4b3b]">
-      <div className="w-full max-w-4xl space-y-6">
-        <h1 className="text-2xl font-bold text-center text-[#4f7a4f]">
-          Positions Dashboard
+    <div className="min-h-screen bg-[#f6f8f6] p-6 flex justify-center text-[#3b4b3b]">
+      <div className="w-full max-w-2xl space-y-6">
+
+        <h1 className="text-3xl font-bold text-center text-[#4f7a4f] tracking-tight">
+          📝 To-Do List
         </h1>
 
+        {/* Top Buttons */}
         <div className="flex justify-center gap-3">
-          <Button className="bg-[#a0d0a0] hover:bg-[#7cb17c] text-white" onClick={fetchPositions}>
+          <Button className="bg-[#9fcea0] hover:bg-[#7caf7c] text-white" onClick={fetchPositions}>
             Refresh
           </Button>
           <Button variant="destructive" onClick={handleLogout}>
@@ -161,37 +163,38 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        <Card className="bg-[#ffffffee] border border-[#d4e0d4] shadow-md backdrop-blur-sm">
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-center mb-4 text-[#4f7a4f]">
-              {editingId ? "Edit Position" : "Create Position"}
+        {/* Form Card */}
+        <Card className="bg-white border border-[#d4e0d4] shadow-sm rounded-xl">
+          <CardContent className="p-5 space-y-4">
+            <h2 className="text-lg font-semibold text-center text-[#4f7a4f]">
+              {editingId ? "✏️ Edit Task" : "➕ Add New Task"}
             </h2>
 
-            <form onSubmit={handleCreateOrUpdate} className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <form onSubmit={handleCreateOrUpdate} className="space-y-3">
               <Input
-                placeholder="Position Code"
+                placeholder="Task Code"
                 value={positionCode}
                 onChange={(e) => setPositionCode(e.target.value)}
                 required
-                className="bg-[#edf5ed] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
+                className="bg-[#f1f5f1] border-[#c8dcc8]"
               />
               <Input
-                placeholder="Position Name"
+                placeholder="Task Name"
                 value={positionName}
                 onChange={(e) => setPositionName(e.target.value)}
                 required
-                className="bg-[#edf5ed] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
+                className="bg-[#f1f5f1] border-[#c8dcc8]"
               />
 
               <div className="flex gap-2">
-                <Button className="flex-1 bg-[#a0d0a0] hover:bg-[#7cb17c] text-white" type="submit">
-                  {editingId ? "Update" : "Create"}
+                <Button className="flex-1 bg-[#9fcea0] hover:bg-[#7caf7c] text-white">
+                  {editingId ? "Update Task" : "Add Task"}
                 </Button>
 
                 {editingId && (
                   <Button
                     variant="outline"
-                    className="flex-1 border-[#a0d0a0] text-[#4f7a4f] hover:bg-[#edf5ed]"
+                    className="flex-1 border-[#9fcea0] text-[#4f7a4f]"
                     onClick={() => {
                       setEditingId(null);
                       setPositionCode("");
@@ -204,63 +207,52 @@ export default function DashboardPage() {
               </div>
             </form>
 
-            {error && <p className="text-red-600 text-center mt-3">{error}</p>}
+            {error && <p className="text-red-600 text-center">{error}</p>}
           </CardContent>
         </Card>
 
-        <Card className="bg-[#ffffffee] border border-[#d4e0d4] shadow-md backdrop-blur-sm">
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-center mb-4 text-[#4f7a4f]">
-              Positions List {loading && "(loading...)"}
+        {/* Todo List */}
+        <Card className="bg-white border border-[#d4e0d4] shadow-sm rounded-xl">
+          <CardContent className="p-5">
+            <h2 className="text-lg font-semibold text-center text-[#4f7a4f] mb-4">
+              Tasks {loading && "(loading...)"} 
             </h2>
 
-            <div className="overflow-x-auto">
-              <table className="w-full bg-[#f9f9f9] border text-left">
-                <thead className="bg-[#edf5ed]">
-                  <tr>
-                    <th className="px-4 py-2 border border-[#c8dcc8]">ID</th>
-                    <th className="px-4 py-2 border border-[#c8dcc8]">Code</th>
-                    <th className="px-4 py-2 border border-[#c8dcc8]">Name</th>
-                    <th className="px-4 py-2 border border-[#c8dcc8]">Actions</th>
-                  </tr>
-                </thead>
+            <div className="space-y-2">
+              {positions.length === 0 && !loading && (
+                <p className="text-center text-gray-500 py-6">No tasks yet.</p>
+              )}
 
-                <tbody>
-                  {positions.length === 0 && !loading && (
-                    <tr>
-                      <td colSpan={4} className="text-center py-6 text-gray-500">
-                        No positions found.
-                      </td>
-                    </tr>
-                  )}
+              {positions.map((p) => (
+                <div
+                  key={p.position_id}
+                  className="flex items-center justify-between bg-[#f9fcf9] border border-[#d9e6d9] rounded-lg px-4 py-3 shadow-sm"
+                >
+                  <div>
+                    <p className="font-medium text-[#3b4b3b]">{p.position_name}</p>
+                    <p className="text-xs text-[#6b8a6b]">Code: {p.position_code}</p>
+                  </div>
 
-                  {positions.map((p) => (
-                    <tr key={p.position_id} className="border-t border-[#c8dcc8]">
-                      <td className="px-4 py-2 border border-[#c8dcc8]">{p.position_id}</td>
-                      <td className="px-4 py-2 border border-[#c8dcc8]">{p.position_code}</td>
-                      <td className="px-4 py-2 border border-[#c8dcc8]">{p.position_name}</td>
-                      <td className="px-4 py-2 border border-[#c8dcc8]">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-[#a0d0a0] text-[#4f7a4f] hover:bg-[#edf5ed]"
-                            onClick={() => startEdit(p)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-[#9fcea0] text-[#4f7a4f]"
+                      onClick={() => startEdit(p)}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(p.position_id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
