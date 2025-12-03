@@ -13,52 +13,62 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
     setError("");
-    setSuccess(false);
-
-    if (!username || !password || !email) {
+    if (!username.trim() || !password.trim() || !email.trim()) {
       setError("Please fill out all fields.");
       return;
     }
 
-    const res = await fetch(`${API_BASE}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, email }),
-    });
+    setLoading(true);
 
-    const data = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email }),
+      });
 
-    if (!res.ok) {
-      setError(data.message || "Registration failed.");
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Registration failed.");
+        setLoading(false);
+        return;
+      }
+
+      setSuccess(true);
+      setUsername("");
+      setPassword("");
+      setEmail("");
+    } catch {
+      setError("Server error. Try again later.");
     }
 
-    setSuccess(true);
-    setUsername("");
-    setPassword("");
-    setEmail("");
+    setLoading(false);
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#0d0d0d] text-white">
-      <Card className="w-full max-w-sm p-6 shadow-xl rounded-xl bg-[#1a1a1a] border border-[#262626]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#f9faf9] via-[#edf5ed] to-[#e0e8e0] text-[#3b4b3b]">
+      <Card className="w-full max-w-sm p-6 shadow-xl rounded-xl bg-[#ffffffee] border border-[#d4e0d4] backdrop-blur-sm">
         <CardContent>
-          <h1 className="text-xl font-bold mb-4 text-center text-[#ff6b00]">
+          {/* Title */}
+          <h1 className="text-xl font-bold mb-4 text-center bg-gradient-to-r from-[#7cb17c] via-[#a0d0a0] to-[#7cb17c] text-transparent bg-clip-text">
             Register
           </h1>
 
           {success ? (
-            <div className="text-center space-y-4">
-              <p className="text-green-500 font-medium">
+            <div className="space-y-4 text-center">
+              <p className="text-green-700 font-medium">
                 Registered successfully! You can now login.
               </p>
+
               <Button
-                className="w-full bg-[#ff6b00] hover:bg-[#e86400]"
+                className="w-full bg-[#a0d0a0] hover:bg-[#7cb17c] text-white transition"
                 onClick={() => router.push("/login")}
               >
                 Go to Login
@@ -67,7 +77,7 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
               <Input
-                className="bg-[#262626] text-white border-[#333]"
+                className="bg-[#f0f7f0] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -75,31 +85,34 @@ export default function RegisterPage() {
               />
 
               <Input
-                type="password"
-                className="bg-[#262626] text-white border-[#333]"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-
-              <Input
-                className="bg-[#262626] text-white border-[#333]"
+                className="bg-[#f0f7f0] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
 
+              <Input
+                type="password"
+                className="bg-[#f0f7f0] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
               {error && (
-                <p className="text-red-500 text-sm font-medium">{error}</p>
+                <p className="text-red-600 text-sm font-medium text-center">
+                  {error}
+                </p>
               )}
 
               <Button
-                className="w-full bg-[#ff6b00] hover:bg-[#e86400]"
+                className="w-full bg-[#a0d0a0] hover:bg-[#7cb17c] text-white transition"
                 type="submit"
+                disabled={loading}
               >
-                Register
+                {loading ? "Creating Account..." : "Register"}
               </Button>
             </form>
           )}
@@ -107,16 +120,16 @@ export default function RegisterPage() {
           {!success && (
             <Button
               variant="link"
-              className="mt-2 w-full text-[#ff6b00]"
+              className="mt-2 w-full text-[#7cb17c] hover:text-[#4b7c4b] transition"
               onClick={() => router.push("/login")}
             >
-              Back to Login
+              Already have an account?
             </Button>
           )}
 
           <Button
             variant="link"
-            className="w-full text-[#ff6b00]"
+            className="w-full text-[#7cb17c] hover:text-[#4b7c4b] transition"
             onClick={() => router.push("/")}
           >
             Back to Home
