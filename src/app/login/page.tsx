@@ -20,7 +20,7 @@ export default function LoginPage() {
     setError("");
 
     if (!username.trim() || !password.trim()) {
-      setError("Please fill both username and password fields.");
+      setError("Please fill both fields.");
       return;
     }
 
@@ -36,11 +36,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data?.accessToken) {
-        setError(
-          res.status === 404
-            ? "No registered character found. Please register first."
-            : data.message || "Invalid login. Try again."
-        );
+        setError(data.message || "Invalid login.");
         setLoading(false);
         return;
       }
@@ -48,23 +44,24 @@ export default function LoginPage() {
       saveToken(data.accessToken);
       router.push("/dashboard");
     } catch {
-      setError("Server error. Try again later.");
+      setError("Server error.");
     }
 
     setLoading(false);
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#0d0d0d] text-white">
-      <Card className="w-full max-w-sm p-6 shadow-xl rounded-xl bg-[#1a1a1a] border border-[#262626]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#f9faf9] via-[#edf5ed] to-[#e0e8e0] text-[#3b4b3b]">
+      <Card className="w-full max-w-sm p-6 shadow-xl rounded-xl bg-[#ffffffee] border border-[#d4e0d4] backdrop-blur-sm">
         <CardContent>
-          <h1 className="text-xl font-bold mb-4 text-center text-[#ff6b00]">
+          {/* Title */}
+          <h1 className="text-xl font-bold mb-4 text-center bg-gradient-to-r from-[#7cb17c] via-[#a0d0a0] to-[#7cb17c] text-transparent bg-clip-text">
             Login
           </h1>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
-              className="bg-[#262626] text-white border-[#333]"
+              className="bg-[#f0f7f0] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -73,17 +70,21 @@ export default function LoginPage() {
 
             <Input
               type="password"
-              className="bg-[#262626] text-white border-[#333]"
+              className="bg-[#f0f7f0] text-[#3b4b3b] border-[#c8dcc8] placeholder-[#6b8a6b]"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-600 text-sm font-medium text-center">
+                {error}
+              </p>
+            )}
 
             <Button
-              className="w-full bg-[#ff6b00] hover:bg-[#e86400]"
+              className="w-full bg-[#a0d0a0] hover:bg-[#7cb17c] text-white transition"
               type="submit"
               disabled={loading}
             >
@@ -93,15 +94,15 @@ export default function LoginPage() {
 
           <Button
             variant="link"
-            className="mt-2 w-full text-[#ff6b00]"
+            className="w-full text-[#7cb17c] hover:text-[#4b7c4b] mt-2 transition"
             onClick={() => router.push("/register")}
           >
-            Create an Account
+            Create Account
           </Button>
 
           <Button
             variant="link"
-            className="w-full text-[#ff6b00]"
+            className="w-full text-[#7cb17c] hover:text-[#4b7c4b] mt-1 transition"
             onClick={() => router.push("/")}
           >
             Back to Home
